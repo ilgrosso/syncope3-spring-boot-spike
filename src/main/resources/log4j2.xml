@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout>
+        <pattern>%d{HH:mm:ss.SSS} %-5level %logger - %msg%n</pattern>
+      </PatternLayout>
+    </Console>
+  </Appenders>
+ 
+  <Loggers>
+    <!-- LOG everything at INFO level -->
+    <Root level="DEBUG">
+      <AppenderRef ref="Console" />
+    </Root>
+ 
+    <!-- LOG "com.baeldung*" at TRACE level -->
+    <Logger name="org.springframework" level="DEBUG"></Logger>
+  </Loggers>
+ 
+</Configuration>
