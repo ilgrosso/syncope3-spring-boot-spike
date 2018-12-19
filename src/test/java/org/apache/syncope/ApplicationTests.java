@@ -35,19 +35,19 @@ public class ApplicationTests {
 
     @Before
     public void setUp() throws Exception {
-        this.baseUrl = new URL("http://localhost:" + port + "/");
+        this.baseUrl = new URL("http://localhost:" + port + "/users");
     }
 
     @Test
     public void getUsers() throws Exception {
-        ResponseEntity<List<String>> response = restTemplate.exchange(baseUrl + "users?domain=Master", HttpMethod.GET,
+        ResponseEntity<List<String>> response = restTemplate.exchange(baseUrl + "?domain=Master", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<String>>() {
         });
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assert.assertNotNull(response.getBody());
         Assert.assertThat(response.getBody(), Matchers.hasSize(5));
 
-        response = restTemplate.exchange(baseUrl + "users?domain=Two", HttpMethod.GET, null,
+        response = restTemplate.exchange(baseUrl + "?domain=Two", HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<String>>() {
         });
         Assert.assertNotNull(response.getBody());
@@ -56,15 +56,15 @@ public class ApplicationTests {
 
     @Test
     public void saveUser() throws Exception {
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "save?domain=Master", "masterUser",
+        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "/save?domain=Master", "masterUser",
                 String.class);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertThat(restTemplate.exchange(baseUrl + "users?domain=Master", HttpMethod.GET,
+        Assert.assertThat(restTemplate.exchange(baseUrl + "?domain=Master", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<String>>() {
         }).getBody(), Matchers.hasSize(6));
-        response = restTemplate.postForEntity(baseUrl + "save?domain=Two", "twoUser", String.class);
+        response = restTemplate.postForEntity(baseUrl + "/save?domain=Two", "twoUser", String.class);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertThat(restTemplate.exchange(baseUrl + "users?domain=Two", HttpMethod.GET,
+        Assert.assertThat(restTemplate.exchange(baseUrl + "?domain=Two", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<String>>() {
         }).getBody(), Matchers.hasSize(2));
     }

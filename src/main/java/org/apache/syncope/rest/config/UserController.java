@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @RequestMapping(consumes = "text/plain;charset=UTF-8", produces = "text/plain;charset=UTF-8", method =
-            RequestMethod.POST, value = "/save")
+            RequestMethod.POST, value = "/users/save")
     public String save(@RequestBody final String username, @QueryParam("domain") final String domain) {
         LOG.debug("Saving user in domain [{}]", domain);
         User user = AuthContextUtils.execWithAuthContext(domain, () -> userDAOWrapper.save(username));

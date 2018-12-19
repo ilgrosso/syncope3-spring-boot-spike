@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.syncope</groupId>
-  <artifactId>jpa-initializer</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <artifactId>syncope-persistence-jpa-spring-boot</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Spring Boot JPA Syncope Init</name>
@@ -64,6 +64,7 @@
   </dependencies>
 
   <build>
+    <finalName>syncope-persistence-jpa-spring-boot</finalName>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
