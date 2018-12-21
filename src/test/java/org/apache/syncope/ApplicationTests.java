@@ -1,18 +1,18 @@
 package org.apache.syncope;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URL;
 import java.util.List;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.syncope.persistence.config.XMLContentLoader;
 import org.apache.syncope.rest.config.DomainConfiguration;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -23,11 +23,10 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { Application.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ApplicationTests {
 
     private URL baseUsersUrl;
@@ -43,7 +42,7 @@ public class ApplicationTests {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.baseUsersUrl = new URL("http://localhost:" + port + "/users");
         this.baseDomainsUrl = new URL("http://localhost:" + port + "/domains");
@@ -54,30 +53,30 @@ public class ApplicationTests {
         ResponseEntity<List<String>> response = restTemplate.exchange(baseUsersUrl + "?domain=Master", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<String>>() {
         });
-        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertNotNull(response.getBody());
-        Assert.assertThat(response.getBody(), Matchers.hasSize(5));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().size() >= 5);
 
         response = restTemplate.exchange(baseUsersUrl + "?domain=Two", HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<String>>() {
         });
-        Assert.assertNotNull(response.getBody());
-        Assert.assertThat(response.getBody(), Matchers.hasSize(1));
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().size() >= 1);
     }
 
     @Test
     public void saveUser() throws Exception {
         ResponseEntity<String> response = restTemplate.postForEntity(baseUsersUrl + "/save?domain=Master", "masterUser",
                 String.class);
-        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertThat(restTemplate.exchange(baseUsersUrl + "?domain=Master", HttpMethod.GET,
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(6, restTemplate.exchange(baseUsersUrl + "?domain=Master", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<String>>() {
-        }).getBody(), Matchers.hasSize(6));
+        }).getBody().size());
         response = restTemplate.postForEntity(baseUsersUrl + "/save?domain=Two", "twoUser", String.class);
-        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertThat(restTemplate.exchange(baseUsersUrl + "?domain=Two", HttpMethod.GET,
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(2, restTemplate.exchange(baseUsersUrl + "?domain=Two", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<String>>() {
-        }).getBody(), Matchers.hasSize(2));
+        }).getBody().size());
     }
 
     @Test
@@ -95,13 +94,13 @@ public class ApplicationTests {
                 .minimumIdle("2")
                 .auditSql("audit.sql"));
         // 2. Check that new beans are registered in the ApplicationContext
-        Assert.assertTrue(applicationContext.containsBean("localThreeDataSource"));
-        Assert.assertTrue(applicationContext.containsBean("ThreeDataSource"));
-        Assert.assertTrue(applicationContext.containsBean("ThreeEntityManagerFactory"));
-        Assert.assertTrue(applicationContext.containsBean("threeResourceDatabasePopulator"));
-        Assert.assertTrue(applicationContext.containsBean("threeDataSourceInitializer"));
-        Assert.assertTrue(applicationContext.containsBean("ThreeTransactionManager"));
-        Assert.assertTrue(applicationContext.containsBean("ThreeContentXML"));
+        assertTrue(applicationContext.containsBean("localThreeDataSource"));
+        assertTrue(applicationContext.containsBean("ThreeDataSource"));
+        assertTrue(applicationContext.containsBean("ThreeEntityManagerFactory"));
+        assertTrue(applicationContext.containsBean("threeResourceDatabasePopulator"));
+        assertTrue(applicationContext.containsBean("threeDataSourceInitializer"));
+        assertTrue(applicationContext.containsBean("ThreeTransactionManager"));
+        assertTrue(applicationContext.containsBean("ThreeContentXML"));
         // 3. Initialize the just created domain like done in LogicInitializer
         XMLContentLoader loader = applicationContext.getBean(
                 org.apache.syncope.persistence.config.XMLContentLoader.class);
@@ -113,17 +112,16 @@ public class ApplicationTests {
                 new ParameterizedTypeReference<List<String>>() {
         }).getBody();
 
-        Assert.assertNotNull(users);
-        Assert.assertThat(users, Matchers.hasSize(1));
-        Assert.assertTrue(StringUtils.contains(users.get(0), "morricone"));
+        assertNotNull(users);
+        assertEquals(1, users.size());
+        assertTrue(StringUtils.contains(users.get(0), "morricone"));
         // 4. Insert an user
         ResponseEntity<String> response = restTemplate.postForEntity(baseUsersUrl + "/save?domain=Three", "monteverdi",
                 String.class);
-        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         // 5. Check user has been successfully created
-        Assert.assertThat(restTemplate.exchange(baseUsersUrl + "?domain=Three", HttpMethod.GET,
+        assertEquals(2, restTemplate.exchange(baseUsersUrl + "?domain=Three", HttpMethod.GET,
                 null, new ParameterizedTypeReference<List<String>>() {
-        }).getBody(), Matchers.hasSize(2));
+        }).getBody().size());
     }
-
 }
