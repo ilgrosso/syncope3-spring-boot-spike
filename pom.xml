@@ -155,12 +155,18 @@
             <goals>
               <goal>start</goal>
             </goals>
+            <configuration>
+              <skip>${skipTests}</skip>
+            </configuration>
           </execution>
           <execution>
             <id>post-integration-test</id>
             <goals>
               <goal>stop</goal>
             </goals>
+            <configuration>
+              <skip>${skipTests}</skip>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -187,6 +193,41 @@
       </resource>
     </resources>
   </build>
+
+  <profiles>
+    <profile>
+      <id>debug</id>
+      
+      <properties>
+        <skipTests>true</skipTests>
+      </properties>
+      
+      <dependencies>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-devtools</artifactId>
+          <optional>true</optional>
+        </dependency>
+      </dependencies>
+      
+      <build>
+        <defaultGoal>clean spring-boot:run</defaultGoal>
+
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+              <arguments>--server.port=9080</arguments>
+              <jvmArguments>
+                -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
+              </jvmArguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <repositories>
     <repository>
