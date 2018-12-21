@@ -4,10 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.1.1.RELEASE</version>
-    <relativePath/>
+    <groupId>org.apache.syncope</groupId>
+    <artifactId>syncope</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
 
   <name>Syncope: Spring Boot spike</name>
@@ -25,6 +24,9 @@
     <anonymousUser>anonymous</anonymousUser>
     <adminPassword>DE088591C00CC98B36F5ADAAF7DA2B004CF7F2FE7BBB45B766B6409876E2F3DB13C7905C6AA59464</adminPassword>
 
+    <rat.skip>true</rat.skip>
+    <checkstyle.skip>true</checkstyle.skip>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
@@ -32,10 +34,27 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <!-- Import dependency management from Spring Boot -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
       <exclusions>
         <exclusion>
           <groupId>org.springframework.boot</groupId>
@@ -52,8 +71,23 @@
       <groupId>org.apache.syncope.core</groupId>
       <artifactId>syncope-core-persistence-jpa</artifactId>
       <version>${syncope.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.bval</groupId>
+          <artifactId>bval-jsr</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.validation</groupId>
+          <artifactId>validation-api</artifactId>          
+        </exclusion>
+      </exclusions>
     </dependency>
-    
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>2.0.1.Final</version>
+    </dependency>
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -71,6 +105,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
       </plugin>
     </plugins>
   </build>
