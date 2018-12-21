@@ -1,10 +1,7 @@
 package org.apache.syncope.persistence.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.syncope.core.persistence.api.SyncopeLoader;
 import org.apache.syncope.core.spring.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +34,6 @@ public class LogicInitializer implements InitializingBean, BeanFactoryAware {
     @Override
     public void afterPropertiesSet() throws Exception {
         ApplicationContextProvider.setBeanFactory(beanFactory);
-        List<SyncopeLoader> loaders = new ArrayList<>();
         org.apache.syncope.persistence.config.XMLContentLoader loader = beanFactory.getBean(
                 org.apache.syncope.persistence.config.XMLContentLoader.class);
         LOG.debug("Starting initialization...");
@@ -47,8 +43,7 @@ public class LogicInitializer implements InitializingBean, BeanFactoryAware {
                 forEachOrdered((entry) -> {
                     loader.getDomains().put(
                             StringUtils.substringBefore(entry.getKey(), DataSource.class.getSimpleName()),
-                            entry.
-                                    getValue());
+                            entry.getValue());
                 });
         LOG.debug("Invoking {} with priority {}", AopUtils.getTargetClass(loader).getName(), loader.getPriority());
         loader.load();

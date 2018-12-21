@@ -62,7 +62,6 @@ public class MasterDomain {
     @Value("${Master.databasePlatform}")
     private String databasePlatform;
 
-    //        <MasterDomain.xml>
     @Bean
     public DataSource localMasterDataSource() {
         HikariConfig hikariConfig = new HikariConfig();
@@ -113,7 +112,7 @@ public class MasterDomain {
         vendorAdapter.setGenerateDdl(true);
         vendorAdapter.setDatabasePlatform(databasePlatform);
         DomainEntityManagerFactoryBean masterEntityManagerFactory = new DomainEntityManagerFactoryBean();
-        masterEntityManagerFactory.setMappingResources(Collections.singletonList(orm).toArray(new String[0]));
+        masterEntityManagerFactory.setMappingResources(orm);
         masterEntityManagerFactory.setPersistenceUnitName("Master");
         masterEntityManagerFactory.setDataSource((DataSource) masterDataSource().getObject());
         masterEntityManagerFactory.setJpaVendorAdapter(vendorAdapter);
