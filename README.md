@@ -1,4 +1,4 @@
-## Introduction
+## Spike for running Apache Syncope 3.0.0 on Spring Boot
 
 This sample application runs initialization of Apache Syncope persistence Spring beans and also starts an H2 database instance containing 2 domains: `Master` and `Two`.
 `Master` domain contains 5 users and `Two` domain a single user.
@@ -6,15 +6,15 @@ This sample application runs initialization of Apache Syncope persistence Spring
 ### How to run
 
 To run application just run:
-`mvn clean verify`
-and then from the root of the project
-`java -jar target/syncope-persistence-jpa-spring-boot.jar`
+`mvn -Pdebug`
 
-It will start a REST server listening on 8080 port, exposing 2 APIs: `/users` to list first 10 users (belonging to a specific domain) and `/users/save` to save and user (onto a specific domain and default realm `/`). 
+It will start a REST server listening on 9080 port, exposing 2 APIs:
+ * `/users` to list first 10 users (belonging to a specific domain)
+ * `/users/save` to save and user (onto a specific domain and default realm `/`). 
 
 #### Sample API requests
 
-`http://localhost:8080/users?domain=Master`
+`http://localhost:9080/users?domain=Master`
 
 Response: 
 
@@ -28,6 +28,6 @@ Response:
 ]
 ```
 
-`http://localhost:8080/users/save?domain=Two`
+`http://localhost:9080/users/save?domain=Two`
 
 with payload a string representing the username (no other properties could be specified since this is not the goal of this spike project).
