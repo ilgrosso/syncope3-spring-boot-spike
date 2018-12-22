@@ -9,9 +9,9 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>Syncope: Spring Boot spike</name>
+  <name>Syncope 3: Spring Boot spike</name>
   <groupId>net.tirasa.syncope</groupId>
-  <artifactId>syncope-spring-boot-spike</artifactId>
+  <artifactId>syncope3-spring-boot-spike</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
