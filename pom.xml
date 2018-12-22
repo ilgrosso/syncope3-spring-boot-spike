@@ -70,6 +70,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.syncope.core.idm</groupId>
+      <artifactId>syncope-core-idm-logic</artifactId>
+      <version>${syncope.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.syncope.core</groupId>
       <artifactId>syncope-core-persistence-jpa</artifactId>
       <version>${syncope.version}</version>
