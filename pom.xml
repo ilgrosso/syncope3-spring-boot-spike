@@ -151,6 +151,11 @@
         <version>${spring-boot.version}</version>
         <executions>
           <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+          <execution>
             <id>pre-integration-test</id>
             <goals>
               <goal>start</goal>
@@ -207,6 +212,15 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-devtools</artifactId>
           <optional>true</optional>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tomcat.embed</groupId>
+          <artifactId>tomcat-embed-jasper</artifactId>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>jstl</artifactId>
         </dependency>
       </dependencies>
       
