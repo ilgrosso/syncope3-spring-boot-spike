@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,12 +28,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource("classpath:domains/Master.properties")
 @PropertySource("classpath:domains/Two.properties")
 @PropertySource("classpath:persistence.properties")
-public class Application {
+public class SyncopeCore extends SpringBootServletInitializer {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(Application.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(SyncopeCore.class);
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(SyncopeCore.class, args);
     }
 
     @Bean

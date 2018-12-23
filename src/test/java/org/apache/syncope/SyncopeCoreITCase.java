@@ -26,8 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { Application.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-public class ApplicationITCase {
+@SpringBootTest(classes = { SyncopeCore.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+public class SyncopeCoreITCase {
 
     private URL baseUsersUrl;
 
@@ -44,8 +44,8 @@ public class ApplicationITCase {
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.baseUsersUrl = new URL("http://localhost:" + port + "/users");
-        this.baseDomainsUrl = new URL("http://localhost:" + port + "/domains");
+        this.baseUsersUrl = new URL("http://localhost:" + port + "/syncope/users");
+        this.baseDomainsUrl = new URL("http://localhost:" + port + "/syncope/domains");
     }
 
     @Test
@@ -108,7 +108,7 @@ public class ApplicationITCase {
         loader.getDomains().put("Three", applicationContext.getBean("ThreeDataSource", DataSource.class));
         loader.load();
         // 3. check content loaded
-        final List<String> users = restTemplate.exchange(baseUsersUrl + "?domain=Three", HttpMethod.GET, null,
+        List<String> users = restTemplate.exchange(baseUsersUrl + "?domain=Three", HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<String>>() {
         }).getBody();
 
