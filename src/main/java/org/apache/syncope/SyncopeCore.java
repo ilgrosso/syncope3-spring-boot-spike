@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource("classpath:persistence.properties")
 public class SyncopeCore extends SpringBootServletInitializer {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(SyncopeCore.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyncopeCore.class);
 
     public static void main(String[] args) {
         SpringApplication.run(SyncopeCore.class, args);

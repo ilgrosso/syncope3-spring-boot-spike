@@ -162,6 +162,9 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${spring-boot.version}</version>
+        <configuration>
+          <arguments>--server.port=9080</arguments>
+        </configuration>
         <executions>
           <execution>
             <goals>

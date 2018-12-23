@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-    Logger LOG = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserDAOWrapper userDAOWrapper;
@@ -37,5 +37,4 @@ public class UserController {
         User user = AuthContextUtils.execWithAuthContext(domain, () -> userDAOWrapper.save(username));
         return user == null ? null : user.getUsername();
     }
-
 }
