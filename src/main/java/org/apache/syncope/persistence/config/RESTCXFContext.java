@@ -16,20 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.syncope.dummy.beans;
+package org.apache.syncope.persistence.config;
 
-import org.apache.syncope.core.persistence.api.dao.NotFoundException;
-import org.apache.syncope.core.persistence.api.entity.resource.ExternalResource;
-import org.apache.syncope.core.provisioning.api.ConnectorRegistry;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 
-public class DummyConnectorRegistry implements ConnectorRegistry {
-
-    @Override
-    public void registerConnector(final ExternalResource resource) throws NotFoundException {
-    }
-
-    @Override
-    public void unregisterConnector(final String id) {
-    }
+@ImportResource("classpath:/restCXFContext.xml")
+@Configuration
+public class RESTCXFContext {
 }

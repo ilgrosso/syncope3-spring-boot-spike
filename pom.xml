@@ -16,24 +16,11 @@
   <packaging>war</packaging>
 
   <properties>
-    <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
     <syncope.version>3.0.0-SNAPSHOT</syncope.version>
-
-    <conf.directory></conf.directory>
-    <log.directory>${project.build.directory}/log</log.directory>
-
-    <adminUser>admin</adminUser>
-    <anonymousUser>anonymous</anonymousUser>
-    <adminPassword>DE088591C00CC98B36F5ADAAF7DA2B004CF7F2FE7BBB45B766B6409876E2F3DB13C7905C6AA59464</adminPassword>
+    <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
 
     <rat.skip>true</rat.skip>
     <checkstyle.skip>true</checkstyle.skip>
-
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <java.version>1.8</java.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencyManagement>
@@ -51,12 +38,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-spring-boot-starter-jaxrs</artifactId>
+      <version>${cxf.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.springframework.boot</groupId>
@@ -68,10 +52,24 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-log4j2</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.syncope.core.idm</groupId>
-      <artifactId>syncope-core-idm-logic</artifactId>
+      <artifactId>syncope-core-idm-rest-cxf</artifactId>
+      <version>${syncope.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.syncope.core</groupId>
+      <artifactId>syncope-core-workflow-java</artifactId>
       <version>${syncope.version}</version>
     </dependency>
     <dependency>
@@ -151,13 +149,29 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <inherited>true</inherited>
+        <executions>
+          <execution>
+            <id>set-bundles</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.2</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -209,15 +223,9 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>ianal-maven-plugin</artifactId>
-        <inherited>true</inherited>
-        <executions>
-          <execution>
-            <goals>
-              <goal>verify-legal-files</goal>
-            </goals>
-            <phase>none</phase>
-          </execution>
-        </executions>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
       </plugin>
     </plugins>
     
@@ -243,14 +251,11 @@
           <artifactId>spring-boot-devtools</artifactId>
           <optional>true</optional>
         </dependency>
+
         <dependency>
-          <groupId>org.apache.tomcat.embed</groupId>
-          <artifactId>tomcat-embed-jasper</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>javax.servlet</groupId>
-          <artifactId>jstl</artifactId>
+          <groupId>org.apache.syncope.ext</groupId>
+          <artifactId>syncope-ext-swagger-ui</artifactId>
+          <version>${syncope.version}</version>
         </dependency>
       </dependencies>
       
@@ -262,13 +267,23 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
             <configuration>
-              <arguments>--server.port=9080</arguments>
+              <arguments>--server.port=9080,--spring.profiles.active=debug</arguments>
               <jvmArguments>
                 -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
               </jvmArguments>
             </configuration>
           </plugin>
         </plugins>
+        
+        <testResources>
+          <testResource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+        </testResources>
       </build>
     </profile>
   </profiles>
