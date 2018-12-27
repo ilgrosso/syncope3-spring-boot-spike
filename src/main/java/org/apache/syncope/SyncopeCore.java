@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan("org.apache.syncope")
 @PropertySource("classpath:persistence.properties")
 @PropertySource("classpath:domains/Master.properties")
-@PropertySource("classpath:domains/Two.properties")
 @PropertySource("classpath:security.properties")
 @PropertySource("classpath:connid.properties")
 @PropertySource("classpath:mail.properties")
@@ -52,10 +51,6 @@ public class SyncopeCore extends SpringBootServletInitializer {
         PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
         pspc.setIgnoreResourceNotFound(true);
         pspc.setIgnoreUnresolvablePlaceholders(true);
-//        pspc.setLocations(new PathMatchingResourcePatternResolver().
-//                getResources("classpath:domains/*.properties"));
-//        pspc.setLocations(new PathMatchingResourcePatternResolver().
-//                getResources("file:${conf.directory}/domains/*.properties"));
         return pspc;
     }
 }

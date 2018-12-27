@@ -31,13 +31,11 @@ public class DomainTransactionInterceptorInjector implements BeanFactoryPostProc
 
     @Override
     public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        String[] names = beanFactory.getBeanNamesForType(TransactionInterceptor.class);
-        for (String name : names) {
+        for (String name : beanFactory.getBeanNamesForType(TransactionInterceptor.class)) {
             BeanDefinition bd = beanFactory.getBeanDefinition(name);
             bd.setBeanClassName(DomainTransactionInterceptor.class.getName());
             bd.setFactoryBeanName(null);
             bd.setFactoryMethodName(null);
         }
     }
-
 }

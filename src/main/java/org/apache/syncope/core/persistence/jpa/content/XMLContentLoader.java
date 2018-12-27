@@ -16,12 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.syncope.persistence.config;
+package org.apache.syncope.core.persistence.jpa.content;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -29,11 +27,9 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import org.apache.syncope.core.persistence.api.SyncopeSpringBootLoader;
 import org.apache.syncope.core.spring.ApplicationContextProvider;
 import org.apache.syncope.core.spring.ResourceWithFallbackLoader;
-import org.apache.syncope.core.persistence.api.content.ContentLoader;
-import org.apache.syncope.core.persistence.jpa.content.AbstractContentDealer;
-import org.apache.syncope.core.persistence.jpa.content.ContentLoaderHandler;
 import org.apache.syncope.core.persistence.jpa.entity.conf.JPAConf;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.dao.DataAccessException;
@@ -45,8 +41,8 @@ import org.xml.sax.SAXException;
 /**
  * Initialize Database with default content if no data is present already.
  */
-@Component("XMLContentLoaderCustom")
-public class XMLContentLoader extends AbstractContentDealer implements ContentLoader {
+@Component
+public class XMLContentLoader extends AbstractContentDealer implements SyncopeSpringBootLoader {
 
     @Resource(name = "viewsXML")
     private ResourceWithFallbackLoader viewsXML;
@@ -54,55 +50,50 @@ public class XMLContentLoader extends AbstractContentDealer implements ContentLo
     @Resource(name = "indexesXML")
     private ResourceWithFallbackLoader indexesXML;
 
-    private Map<String, DataSource> domains = new HashMap<>();
-
     @Override
-    public Integer getPriority() {
+    public int getOrder() {
         return 0;
     }
 
     @Override
-    public void load() {
-        final Map<String, DataSource> availableDomains = domains.isEmpty() ? domainsHolder.getDomains() : domains;
-        availableDomains.forEach((domain, datasource) -> {
-            LOG.debug("Loading data for domain [{}]", domain);
-            // create EntityManager so OpenJPA will build the SQL schema
-            EntityManagerFactoryUtils.findEntityManagerFactory(
-                    ApplicationContextProvider.getBeanFactory(), domain).createEntityManager();
+    public void load(final String domain, final DataSource datasource) {
+        LOG.debug("Loading data for domain [{}]", domain);
+        // create EntityManager so OpenJPA will build the SQL schema
+        EntityManagerFactoryUtils.findEntityManagerFactory(
+                ApplicationContextProvider.getBeanFactory(), domain).createEntityManager();
 
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
-            boolean existingData;
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
+        boolean existingData;
+        try {
+            existingData = jdbcTemplate.queryForObject("SELECT COUNT(0) FROM " + JPAConf.TABLE, Integer.class) > 0;
+        } catch (DataAccessException e) {
+            LOG.error("[{}] Could not access to table " + JPAConf.TABLE, domain, e);
+            existingData = true;
+        }
+
+        if (existingData) {
+            LOG.info("[{}] Data found in the database, leaving untouched", domain);
+        } else {
+            LOG.info("[{}] Empty database found, loading default content", domain);
+
             try {
-                existingData = jdbcTemplate.queryForObject("SELECT COUNT(0) FROM " + JPAConf.TABLE, Integer.class) > 0;
-            } catch (DataAccessException e) {
-                LOG.error("[{}] Could not access to table " + JPAConf.TABLE, domain, e);
-                existingData = true;
+                createViews(domain, datasource);
+            } catch (IOException e) {
+                LOG.error("[{}] While creating views", domain, e);
             }
-
-            if (existingData) {
-                LOG.info("[{}] Data found in the database, leaving untouched", domain);
-            } else {
-                LOG.info("[{}] Empty database found, loading default content", domain);
-
-                try {
-                    createViews(domain, datasource);
-                } catch (IOException e) {
-                    LOG.error("[{}] While creating views", domain, e);
-                }
-                try {
-                    createIndexes(domain, datasource);
-                } catch (IOException e) {
-                    LOG.error("[{}] While creating indexes", domain, e);
-                }
-                try {
-                    ResourceWithFallbackLoader contentXML = ApplicationContextProvider.getBeanFactory().
-                            getBean(domain + "ContentXML", ResourceWithFallbackLoader.class);
-                    loadDefaultContent(domain, contentXML, datasource);
-                } catch (Exception e) {
-                    LOG.error("[{}] While loading default content", domain, e);
-                }
+            try {
+                createIndexes(domain, datasource);
+            } catch (IOException e) {
+                LOG.error("[{}] While creating indexes", domain, e);
             }
-        });
+            try {
+                ResourceWithFallbackLoader contentXML = ApplicationContextProvider.getBeanFactory().
+                        getBean(domain + "ContentXML", ResourceWithFallbackLoader.class);
+                loadDefaultContent(domain, contentXML, datasource);
+            } catch (Exception e) {
+                LOG.error("[{}] While loading default content", domain, e);
+            }
+        }
     }
 
     private void loadDefaultContent(
@@ -153,9 +144,4 @@ public class XMLContentLoader extends AbstractContentDealer implements ContentLo
 
         LOG.debug("Indexes created");
     }
-
-    public Map<String, DataSource> getDomains() {
-        return domains;
-    }
-
 }

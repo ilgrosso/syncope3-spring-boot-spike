@@ -2,18 +2,16 @@ package org.apache.syncope.persistence.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.util.Collections;
 import javax.sql.DataSource;
 import org.apache.syncope.core.persistence.jpa.spring.CommonEntityManagerFactoryConf;
 import org.apache.syncope.core.persistence.jpa.spring.DomainEntityManagerFactoryBean;
+import org.apache.syncope.core.spring.ResourceWithFallbackLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -22,11 +20,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
-/*
- * Replacement of MasterDomain.xml
- */
 @Configuration
-@Import(ResourcesContext.class)
 public class MasterDomain {
 
     @Autowired
@@ -62,7 +56,9 @@ public class MasterDomain {
     @Value("${Master.databasePlatform}")
     private String databasePlatform;
 
-    @Bean
+    @Value("${content.directory}")
+    private String contentDirectory;
+
     public DataSource localMasterDataSource() {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setDriverClassName(driverClassName);
@@ -76,8 +72,6 @@ public class MasterDomain {
     }
 
     @Bean(name = "MasterDataSource")
-    @Primary
-    @DependsOn("localMasterDataSource")
     public JndiObjectFactoryBean masterDataSource() {
         JndiObjectFactoryBean masterDataSource = new JndiObjectFactoryBean();
         masterDataSource.setJndiName("java:comp/env/jdbc/syncopeMasterDataSource");
@@ -105,7 +99,7 @@ public class MasterDomain {
     }
 
     @Bean(name = "MasterEntityManagerFactory")
-    @DependsOn(value = "commonEMFConf")
+    @DependsOn("commonEMFConf")
     public DomainEntityManagerFactoryBean masterEntityManagerFactory() {
         OpenJpaVendorAdapter vendorAdapter = new OpenJpaVendorAdapter();
         vendorAdapter.setShowSql(false);
@@ -121,9 +115,24 @@ public class MasterDomain {
     }
 
     @Bean(name = "MasterTransactionManager")
-    @Qualifier(value = "Master")
+    @Qualifier("Master")
     public PlatformTransactionManager transactionManager() {
         return new JpaTransactionManager(masterEntityManagerFactory().getObject());
     }
 
+    @Bean(name = "MasterProperties")
+    public ResourceWithFallbackLoader masterProperties() {
+        ResourceWithFallbackLoader masterProperties = new ResourceWithFallbackLoader();
+        masterProperties.setPrimary("file:" + contentDirectory + "/domains/Master.properties");
+        masterProperties.setFallback("classpath:domains/Master.properties");
+        return masterProperties;
+    }
+
+    @Bean(name = "MasterContentXML")
+    public ResourceWithFallbackLoader masterContentXML() {
+        ResourceWithFallbackLoader masterContentXML = new ResourceWithFallbackLoader();
+        masterContentXML.setPrimary("file:" + contentDirectory + "/domains/MasterContent.xml");
+        masterContentXML.setFallback("classpath:domains/MasterContent.xml");
+        return masterContentXML;
+    }
 }

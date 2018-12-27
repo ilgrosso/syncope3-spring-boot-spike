@@ -15,6 +15,7 @@ import org.apache.syncope.core.persistence.api.dao.UserDAO;
 import org.apache.syncope.core.persistence.api.entity.EntityFactory;
 import org.apache.syncope.core.persistence.jpa.spring.CommonEntityManagerFactoryConf;
 import org.apache.syncope.core.persistence.jpa.spring.MultiJarAwarePersistenceUnitPostProcessor;
+import org.apache.syncope.core.spring.ResourceWithFallbackLoader;
 import org.apache.syncope.persistence.interceptors.DomainTransactionInterceptorInjector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 @Configuration
 public class PersistenceContext implements EnvironmentAware {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PersistenceContext.class);
+    private static final Logger OPENJPA_LOG = LoggerFactory.getLogger("org.apache.openjpa");
 
     private Environment env;
 
@@ -51,10 +52,10 @@ public class PersistenceContext implements EnvironmentAware {
         Map<String, Object> jpaPropertyMap = new HashMap<>();
 
         jpaPropertyMap.put("openjpa.Log", "slf4j");
-        if (LOG.isDebugEnabled()) {
+        if (OPENJPA_LOG.isDebugEnabled()) {
             jpaPropertyMap.put("openjpa.Log", "SQL=TRACE");
             jpaPropertyMap.put("openjpa.ConnectionFactoryProperties",
-                    "PrintParameters=true, PrettyPrint=true, PrettyPrintLineLength=80");
+                    "PrintParameters=true, PrettyPrint=true, PrettyPrintLineLength=120");
         }
 
         jpaPropertyMap.put("openjpa.NontransactionalWrite", false);
@@ -68,7 +69,7 @@ public class PersistenceContext implements EnvironmentAware {
         jpaPropertyMap.put("openjpa.DataCache", "true");
         jpaPropertyMap.put("openjpa.QueryCache", "true");
 
-        jpaPropertyMap.put("openjpa.RemoteCommitProvider", env.getProperty("${openjpa.RemoteCommitProvider:sjvm}"));
+        jpaPropertyMap.put("openjpa.RemoteCommitProvider", env.getProperty("openjpa.RemoteCommitProvider", "sjvm"));
 
         commonEMFConf.setJpaPropertyMap(jpaPropertyMap);
         return commonEMFConf;
@@ -140,5 +141,21 @@ public class PersistenceContext implements EnvironmentAware {
     @Bean
     public Validator localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
+    }
+
+    @Bean
+    public ResourceWithFallbackLoader viewsXML() {
+        ResourceWithFallbackLoader viewsXML = new ResourceWithFallbackLoader();
+        viewsXML.setPrimary("file:" + env.getProperty("content.directory") + "/views.xml");
+        viewsXML.setFallback("classpath:views.xml");
+        return viewsXML;
+    }
+
+    @Bean
+    public ResourceWithFallbackLoader indexesXML() {
+        ResourceWithFallbackLoader indexesXML = new ResourceWithFallbackLoader();
+        indexesXML.setPrimary("file:" + env.getProperty("content.directory") + "/indexes.xml");
+        indexesXML.setFallback("classpath:indexes.xml");
+        return indexesXML;
     }
 }
