@@ -31,9 +31,8 @@ public class UserDAOWrapper {
     public User save(final String username) {
         User user = entityFactory.newEntity(User.class);
         user.setUsername(username);
-        user.setRealm(realmDAO.findByFullPath("/"));
+        user.setRealm(realmDAO.getRoot());
         user.setPassword("Password123", CipherAlgorithm.SHA);
         return userDAO.save(user);
     }
-
 }

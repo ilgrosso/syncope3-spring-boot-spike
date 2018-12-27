@@ -28,7 +28,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebInitializer implements WebMvcConfigurer, ServletContextInitializer {
+public class WADLInitializer implements WebMvcConfigurer, ServletContextInitializer {
 
     @Override
     public void addViewControllers(final ViewControllerRegistry registry) {
