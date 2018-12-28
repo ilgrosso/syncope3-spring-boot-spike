@@ -20,7 +20,6 @@ package org.apache.syncope.persistence.config;
 
 import org.apache.syncope.core.logic.LogicInvocationHandler;
 import org.apache.syncope.core.logic.init.ClassPathScanImplementationLookup;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +42,6 @@ public class LogicContext implements EnvironmentAware {
         return new LogicInvocationHandler();
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public ClassPathScanImplementationLookup classPathScanImplementationLookup()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {

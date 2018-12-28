@@ -21,7 +21,6 @@ package org.apache.syncope.persistence.config;
 import org.apache.syncope.core.workflow.api.AnyObjectWorkflowAdapter;
 import org.apache.syncope.core.workflow.api.GroupWorkflowAdapter;
 import org.apache.syncope.core.workflow.api.UserWorkflowAdapter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +36,6 @@ public class WorkflowContext implements EnvironmentAware {
         this.env = env;
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public UserWorkflowAdapter uwfAdapter()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -46,7 +44,6 @@ public class WorkflowContext implements EnvironmentAware {
                 newInstance();
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public GroupWorkflowAdapter gwfAdapter()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -55,7 +52,6 @@ public class WorkflowContext implements EnvironmentAware {
                 newInstance();
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public AnyObjectWorkflowAdapter awfAdapter()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {

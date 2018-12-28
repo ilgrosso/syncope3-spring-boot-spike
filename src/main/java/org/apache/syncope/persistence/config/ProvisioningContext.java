@@ -19,11 +19,12 @@
 package org.apache.syncope.persistence.config;
 
 import org.apache.syncope.core.provisioning.api.AnyObjectProvisioningManager;
+import org.apache.syncope.core.provisioning.api.AuditManager;
 import org.apache.syncope.core.provisioning.api.GroupProvisioningManager;
 import org.apache.syncope.core.provisioning.api.UserProvisioningManager;
 import org.apache.syncope.core.provisioning.api.cache.VirAttrCache;
+import org.apache.syncope.core.provisioning.api.notification.NotificationManager;
 import org.apache.syncope.core.provisioning.api.propagation.PropagationTaskExecutor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +42,6 @@ public class ProvisioningContext implements EnvironmentAware {
         this.env = env;
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public PropagationTaskExecutor propagationTaskExecutor()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -50,7 +50,6 @@ public class ProvisioningContext implements EnvironmentAware {
                 newInstance();
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public UserProvisioningManager userProvisioningManager()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -59,7 +58,6 @@ public class ProvisioningContext implements EnvironmentAware {
                 newInstance();
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public GroupProvisioningManager groupProvisioningManager()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -68,7 +66,6 @@ public class ProvisioningContext implements EnvironmentAware {
                 newInstance();
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public AnyObjectProvisioningManager anyObjectProvisioningManager()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -77,12 +74,27 @@ public class ProvisioningContext implements EnvironmentAware {
                 newInstance();
     }
 
-    @ConditionalOnMissingBean
     @Bean
     public VirAttrCache virAttrCache()
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         return (VirAttrCache) Class.forName(env.getProperty("virAttrCache")).
+                newInstance();
+    }
+
+    @Bean
+    public NotificationManager notificationManager()
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+        return (NotificationManager) Class.forName(env.getProperty("notificationManager")).
+                newInstance();
+    }
+
+    @Bean
+    public AuditManager auditManager()
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+        return (AuditManager) Class.forName(env.getProperty("auditManager")).
                 newInstance();
     }
 }
